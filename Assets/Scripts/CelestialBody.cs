@@ -6,19 +6,29 @@ public class CelestialBody : MonoBehaviour
 {
     public CelestialBodyData data;
 
+    public Material material;
+
+    public ShapeSettings shapeSettings;
+    public ColorSettings colorSettings;
+
     public int resolution;
 
     MeshFilter[] meshFilters;
     TerrainFace[] terrainFaces;
 
+    public ShapeGenerator shapeGenerator = new ShapeGenerator();
+    public ColorGenerator colorGenerator = new ColorGenerator();
+
     private void Start()
     {
         Initialize();
         GenerateMesh();
+        GenerateColors();
     }
 
     void Initialize()
     {
+        shapeGenerator.UpdateSettings(shapeSettings);
         GameObject meshesGo = new GameObject();
         meshesGo.name = "Graphics";
         meshesGo.transform.parent = transform;
@@ -26,6 +36,7 @@ public class CelestialBody : MonoBehaviour
 
         meshFilters = new MeshFilter[6];
         terrainFaces = new TerrainFace[6];
+        var meshRenderers = new MeshRenderer[6];
 
         Vector3[] directions = { Vector3.up, Vector3.down, Vector3.left, Vector3.right, Vector3.forward, Vector3.back };
 
@@ -36,29 +47,36 @@ public class CelestialBody : MonoBehaviour
             meshObj.transform.localPosition = Vector3.zero;
 
             var meshRenderer = meshObj.AddComponent<MeshRenderer>();
-            meshRenderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            meshRenderer.material = material;
             if (data.type == CelestialBodyType.Star)
             {
                 meshRenderer.material.EnableKeyword("_EMISSION");
                 meshRenderer.material.SetColor("_EmissionColor", data.color);
             }
-                meshRenderer.material.SetColor("_BaseColor", data.color);
+            meshRenderers[i] = meshRenderer;
             meshFilters[i] = meshObj.AddComponent<MeshFilter>();
             meshFilters[i].mesh = new Mesh();
 
-            terrainFaces[i] = new TerrainFace(meshFilters[i].mesh, resolution, directions[i], data.radius);
+            terrainFaces[i] = new TerrainFace(meshFilters[i].mesh, resolution, directions[i], shapeGenerator);
         }
+        colorGenerator.UpdateSettings(colorSettings, meshRenderers);
 
-        if(data.type == CelestialBodyType.Star)
+        if (data.type == CelestialBodyType.Star)
         {
             GameObject lightGo = new GameObject();
             lightGo.transform.parent = transform;
             var light = lightGo.AddComponent<Light>();
-            light.color = data.color;
+            light.color = Color.Lerp(Color.white, data.color, 0.75f);
             light.type = LightType.Point;
-            light.range = data.radius * 10f;
-            light.intensity = 500;
+            light.range = data.lightRange;
+            light.intensity = data.lightIntensity;
         }
+    }
+
+    private void Update()
+    {
+        transform.Rotate(data.rotationAxis, data.rotationSpeed * Time.deltaTime, Space.Self);
+        transform.RotateAround(transform.parent.position, data.orbitAxis, data.orbitSpeed * Time.deltaTime);
     }
 
     void GenerateMesh()
@@ -66,6 +84,17 @@ public class CelestialBody : MonoBehaviour
         foreach(var face in terrainFaces)
         {
             face.ConstructMesh();
+        }
+
+        colorGenerator.UpdateElevation(shapeGenerator.elevationMinMax);
+    }
+
+    void GenerateColors()
+    {
+        colorGenerator.UpdateColors();
+        for (int i = 0; i < terrainFaces.Length; i++)
+        {
+                terrainFaces[i].UpdateUVs(colorGenerator);
         }
     }
 }
@@ -79,10 +108,25 @@ public class CelestialBodyData
 
     public float radius;
 
+    public float rotationSpeed;
+
+    public Vector3 rotationAxis;
+
+    public float orbitSpeed;
+
+    public Vector3 orbitAxis;
+
+    public float initialOrbitProgress;
+
     [ColorUsage(false, false)]
     public Color color;
 
     public CelestialBodyData[] orbitingBodies;
+
+    public float lightRange;
+
+    public float lightIntensity;
+
 }
 
 public enum CelestialBodyType
