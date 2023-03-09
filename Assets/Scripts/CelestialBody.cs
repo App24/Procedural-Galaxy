@@ -75,7 +75,10 @@ public class CelestialBody : MonoBehaviour
 
     private void Update()
     {
-        transform.Rotate(data.rotationAxis, data.rotationSpeed * Time.deltaTime, Space.Self);
+        if (!data.tidalLocked)
+            transform.Rotate(data.rotationAxis, data.rotationSpeed * Time.deltaTime, Space.Self);
+        else
+            transform.LookAt(transform.parent.position);
         transform.RotateAround(transform.parent.position, data.orbitAxis, data.orbitSpeed * Time.deltaTime);
     }
 
@@ -127,6 +130,7 @@ public class CelestialBodyData
 
     public float lightIntensity;
 
+    public bool tidalLocked;
 }
 
 public enum CelestialBodyType

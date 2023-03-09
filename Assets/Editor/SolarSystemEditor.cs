@@ -10,7 +10,6 @@ public class SolarSystemEditor : Editor
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
-        EditorGUI.BeginDisabledGroup(!Application.isPlaying);
         if (GUILayout.Button("Randomize"))
         {
             var random = new System.Random();
@@ -19,12 +18,12 @@ public class SolarSystemEditor : Editor
                 var solarSystem = target as SolarSystem;
                 solarSystem.seed = random.Next();
             }
+            if(Application.isPlaying)
             foreach (var target in targets)
             {
                 var solarSystem = target as SolarSystem;
                 solarSystem.Recreate();
             }
         }
-        EditorGUI.EndDisabledGroup();
     }
 }
