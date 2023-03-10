@@ -21,6 +21,12 @@ public class CelestialBody : MonoBehaviour
 
     private void Start()
     {
+        Recreate();
+    }
+
+    [ContextMenu("Recreate")]
+    public void Recreate()
+    {
         Initialize();
         GenerateMesh();
         GenerateColors();
@@ -53,6 +59,8 @@ public class CelestialBody : MonoBehaviour
                 meshRenderer.material.EnableKeyword("_EMISSION");
                 meshRenderer.material.SetColor("_EmissionColor", data.color);
             }
+            meshRenderer.material.SetFloat("_smoothness", data.waterAlbedo);
+            meshRenderer.material.SetFloat("_LandSmoothness", data.albedo);
             meshRenderers[i] = meshRenderer;
             meshFilters[i] = meshObj.AddComponent<MeshFilter>();
             meshFilters[i].mesh = new Mesh();
@@ -131,6 +139,12 @@ public class CelestialBodyData
     public float lightIntensity;
 
     public bool tidalLocked;
+
+    public float distanceFromStar;
+
+    public float waterAlbedo;
+
+    public float albedo;
 }
 
 public enum CelestialBodyType

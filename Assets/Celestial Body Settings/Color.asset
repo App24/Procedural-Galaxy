@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c1456ff936fcaf45994b972e6085fb6, type: 3}
   m_Name: Color
   m_EditorClassIdentifier: 
-  planetMaterial: {fileID: 0}
   biomeColorSettings:
     biomes:
     - gradient:
@@ -42,7 +41,6 @@ MonoBehaviour:
         atime6: 0
         atime7: 0
         m_Mode: 0
-        m_ColorSpace: 0
         m_NumColorKeys: 4
         m_NumAlphaKeys: 2
       tint: {r: 0, g: 0, b: 0, a: 0}
@@ -75,7 +73,6 @@ MonoBehaviour:
         atime6: 0
         atime7: 0
         m_Mode: 0
-        m_ColorSpace: 0
         m_NumColorKeys: 5
         m_NumAlphaKeys: 2
       tint: {r: 1, g: 0.8999224, b: 0, a: 0}
@@ -108,7 +105,6 @@ MonoBehaviour:
         atime6: 0
         atime7: 0
         m_Mode: 0
-        m_ColorSpace: 0
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
       tint: {r: 1, g: 1, b: 1, a: 0}
@@ -163,6 +159,5 @@ MonoBehaviour:
     atime6: 0
     atime7: 0
     m_Mode: 0
-    m_ColorSpace: 0
     m_NumColorKeys: 3
     m_NumAlphaKeys: 2
