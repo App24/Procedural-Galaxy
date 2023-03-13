@@ -434,11 +434,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a6de8c92237758448b1a39b8a4ddefd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seed: 515
+  seed: 2
   celestialBodyResolution: 20
-  lightIntensity: 500
-  lightRadius: 2
-  orbitSpeed: 20
+  lightIntensity: 2500
+  lightRadius: 3
+  orbitSpeed: 5
+  maxPlanets: 10
   planetMaterial: {fileID: 2100000, guid: bafc3429e9c076e48b04531a546f61b2, type: 2}
   shapeSettings: {fileID: 11400000, guid: 60cf60e82637aab4a8086878358409b5, type: 2}
   colorSettings: {fileID: 11400000, guid: 5ce294d59e88c6847aea9b93eb270cac, type: 2}

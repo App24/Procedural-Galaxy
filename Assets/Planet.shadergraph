@@ -682,13 +682,13 @@
             "m_Id": "e802de1f6a7a4daba28a81ddd27f3f62"
         },
         {
+            "m_Id": "8fc16db180124bd8977bc1cba15c9bd5"
+        },
+        {
             "m_Id": "31a04f8b78134dd388e4cfef7e65367c"
         },
         {
             "m_Id": "6a79629fae6c4281b264d461f0ae1ba3"
-        },
-        {
-            "m_Id": "8fc16db180124bd8977bc1cba15c9bd5"
         }
     ]
 }
@@ -2203,7 +2203,7 @@
         "a": 0.0
     },
     "isMainColor": false,
-    "m_ColorMode": 0
+    "m_ColorMode": 1
 }
 
 {

@@ -19,6 +19,8 @@ public class CelestialBody : MonoBehaviour
     public ShapeGenerator shapeGenerator = new ShapeGenerator();
     public ColorGenerator colorGenerator = new ColorGenerator();
 
+    GameObject meshesGo;
+
     private void Start()
     {
         Recreate();
@@ -35,7 +37,7 @@ public class CelestialBody : MonoBehaviour
     void Initialize()
     {
         shapeGenerator.UpdateSettings(shapeSettings);
-        GameObject meshesGo = new GameObject();
+        meshesGo = new GameObject();
         meshesGo.name = "Graphics";
         meshesGo.transform.parent = transform;
         meshesGo.transform.localPosition = new Vector3(0, 0, 0);
@@ -57,7 +59,7 @@ public class CelestialBody : MonoBehaviour
             if (data.type == CelestialBodyType.Star)
             {
                 meshRenderer.material.EnableKeyword("_EMISSION");
-                meshRenderer.material.SetColor("_EmissionColor", data.color);
+                meshRenderer.material.SetColor("_EmissionColor", data.color * 2);
             }
             meshRenderer.material.SetFloat("_smoothness", data.waterAlbedo);
             meshRenderer.material.SetFloat("_LandSmoothness", data.albedo);
@@ -71,10 +73,9 @@ public class CelestialBody : MonoBehaviour
 
         if (data.type == CelestialBodyType.Star)
         {
-            GameObject lightGo = new GameObject();
-            lightGo.transform.parent = transform;
-            var light = lightGo.AddComponent<Light>();
-            light.color = Color.Lerp(Color.white, data.color, 0.75f);
+            var light = gameObject.AddComponent<Light>();
+            light.useColorTemperature = true;
+            light.colorTemperature = data.temperature * 100f;
             light.type = LightType.Point;
             light.range = data.lightRange;
             light.intensity = data.lightIntensity;
@@ -84,9 +85,9 @@ public class CelestialBody : MonoBehaviour
     private void Update()
     {
         if (!data.tidalLocked)
-            transform.Rotate(data.rotationAxis, data.rotationSpeed * Time.deltaTime, Space.Self);
+            meshesGo.transform.Rotate(data.rotationAxis, data.rotationSpeed * Time.deltaTime, Space.Self);
         else
-            transform.LookAt(transform.parent.position);
+            meshesGo.transform.LookAt(transform.parent.position);
         transform.RotateAround(transform.parent.position, data.orbitAxis, data.orbitSpeed * Time.deltaTime);
     }
 
@@ -113,6 +114,8 @@ public class CelestialBody : MonoBehaviour
 [System.Serializable]
 public class CelestialBodyData
 {
+    public string name;
+
     public CelestialBodyType type;
 
     public float orbitDistance;
@@ -145,6 +148,8 @@ public class CelestialBodyData
     public float waterAlbedo;
 
     public float albedo;
+
+    public float temperature;
 }
 
 public enum CelestialBodyType

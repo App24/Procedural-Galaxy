@@ -25,6 +25,9 @@ public class SolarSystem : MonoBehaviour
     [Delayed]
     public float orbitSpeed = 20f;
 
+    [Delayed, Min(1)]
+    public int maxPlanets = 10;
+
     public Material planetMaterial;
 
     public ShapeSettings shapeSettings;
@@ -33,6 +36,8 @@ public class SolarSystem : MonoBehaviour
     public Gradient dryOceanColor;
     public Gradient wetOceanColor;
     public Gradient frozenOceanColor;
+
+    const string glyphs = "0123456789";
 
     private void Awake()
     {
@@ -44,32 +49,61 @@ public class SolarSystem : MonoBehaviour
         Random.InitState(seed);
         data = new SolarSystemData();
         data.sunBody = new CelestialBodyData();
+        string numbers = "";
+        for (int i = 0; i < 6; i++)
+        {
+            numbers += glyphs[Random.Range(0, glyphs.Length)];
+        }
+        string starName = $"HIP {numbers}";
+        data.sunBody.name = $"(Star) {starName}";
         data.sunBody.type = CelestialBodyType.Star;
         float temperature = Random.Range(17f, 50f);
+        data.sunBody.temperature = temperature;
         data.sunBody.color = CelestialUtilities.TemperatureToColor(temperature * 100f);
         data.sunBody.radius = Random.Range(10f, 20f);
         data.sunBody.lightIntensity = lightIntensity * (100 / data.sunBody.radius);
         data.sunBody.rotationAxis = Vector3.up;
 
-        int planets = Random.Range(1, 10);
+        int planets = Random.Range(1, maxPlanets);
         float distance = data.sunBody.radius;
         data.sunBody.orbitingBodies = new CelestialBodyData[planets];
 
         for (int i = 0; i < planets; i++)
         {
             var body = new CelestialBodyData();
+            string planetName = $"{starName} {i + 1}";
+            body.name = $"(Planet) {planetName}";
             body.type = CelestialBodyType.Planet;
             distance += Random.Range(20f, 40f);
             body.orbitDistance = distance;
-            body.radius = Random.Range(0.75f, 3f);
+            body.radius = Random.Range(0.75f, 6f);
             body.orbitingBodies = new CelestialBodyData[0];
             body.rotationSpeed = Random.Range(20f, 50f);
             body.rotationAxis = Vector3.up;
             if (Random.value < 0.2f) body.rotationAxis = Vector3.left;
             body.orbitAxis = Vector3.up;
+            if (Random.value < 0.2f) body.orbitAxis = Vector3.down;
             body.orbitSpeed = orbitSpeed * (100 / distance);
             body.tidalLocked = Random.value < 0.2f;
             body.initialOrbitProgress = Random.value;
+            if(Random.value < 0.1f)
+            {
+                var moon = new CelestialBodyData();
+                moon.name = $"(Moon) {planetName}.1";
+                moon.type = CelestialBodyType.Planet;
+                moon.orbitDistance = Random.Range(body.radius * 1.5f, body.radius * 2.5f);
+                moon.orbitingBodies = new CelestialBodyData[0];
+                moon.rotationSpeed = Random.Range(20f, 50f);
+                moon.rotationAxis = Vector3.up;
+                moon.radius = Random.Range(body.radius/20f, body.radius/5f);
+                moon.orbitSpeed = orbitSpeed * (100 / (moon.orbitDistance + body.radius));
+                moon.orbitAxis = Vector3.up;
+                if (Random.value < 0.2f) moon.orbitAxis = Vector3.down;
+                moon.tidalLocked = Random.value < 0.2f;
+                moon.initialOrbitProgress = Random.value;
+
+                body.orbitingBodies = new CelestialBodyData[] { moon };
+            }
             data.sunBody.orbitingBodies[i] = body;
         }
 
@@ -78,9 +112,11 @@ public class SolarSystem : MonoBehaviour
         for (int i = 0; i < planets; i++)
         {
             var body = data.sunBody.orbitingBodies[i];
-            body.distanceFromStar = (body.orbitDistance - firstDistance) / (distance - firstDistance);
+            if (planets <= 1)
+                body.distanceFromStar = 0;
+            else body.distanceFromStar = (body.orbitDistance - firstDistance) / (distance - firstDistance);
             body.waterAlbedo = body.distanceFromStar * 0.8f;
-            body.albedo = Mathf.Clamp01(body.distanceFromStar - 0.5f)  * 2 * 0.7f;
+            body.albedo = Mathf.Clamp01(body.distanceFromStar - 0.5f)  * 2 * 0.5f;
         }
 
         data.sunBody.lightRange = data.sunBody.orbitingBodies[planets - 1].orbitDistance * lightRadius;
@@ -96,6 +132,7 @@ public class SolarSystem : MonoBehaviour
     void CreateBody(float distance, Transform parent, CelestialBodyData body)
     {
         GameObject go = new GameObject();
+        go.name = body.name;
         var celestialBody = go.AddComponent<CelestialBody>();
         celestialBody.material = planetMaterial;
         celestialBody.data = body;
@@ -135,6 +172,7 @@ public class SolarSystem : MonoBehaviour
                         shapeSettings.noiseLayers[i].noiseSettings.simpleNoiseSettings.minValue += Random.Range(-0.05f, 0.05f);
                         shapeSettings.noiseLayers[i].noiseSettings.simpleNoiseSettings.persistence += Random.Range(-0.05f, 0.05f);
                         shapeSettings.noiseLayers[i].noiseSettings.simpleNoiseSettings.roughness += Random.Range(-0.05f, 0.05f);
+                        shapeSettings.noiseLayers[i].noiseSettings.simpleNoiseSettings.strength += Random.Range(-0.05f, 0.05f);
                     }
                     {
                         shapeSettings.noiseLayers[i].noiseSettings.ridgidNoiseSettings.center = Random.insideUnitSphere * Random.Range(0, 5000f);
@@ -142,6 +180,7 @@ public class SolarSystem : MonoBehaviour
                         shapeSettings.noiseLayers[i].noiseSettings.ridgidNoiseSettings.minValue += Random.Range(-0.05f, 0.05f);
                         shapeSettings.noiseLayers[i].noiseSettings.ridgidNoiseSettings.persistence += Random.Range(-0.05f, 0.05f);
                         shapeSettings.noiseLayers[i].noiseSettings.ridgidNoiseSettings.roughness += Random.Range(-0.05f, 0.05f);
+                        shapeSettings.noiseLayers[i].noiseSettings.ridgidNoiseSettings.strength += Random.Range(-0.05f, 0.05f);
                     }
                 }
             }
@@ -202,11 +241,11 @@ public class SolarSystem : MonoBehaviour
         celestialBody.colorSettings = colorSettings;
         go.transform.parent = parent;
         go.transform.localPosition = new Vector3(0, 0, distance);
-        go.transform.RotateAround(go.transform.parent.position, body.orbitAxis, 360f * body.initialOrbitProgress);
+        go.transform.RotateAround(parent.position, body.orbitAxis, 360f * body.initialOrbitProgress);
 
         foreach (var child in body.orbitingBodies)
         {
-            CreateBody(distance + child.orbitDistance, go.transform, child);
+            CreateBody(child.orbitDistance, go.transform, child);
         }
     }
 
