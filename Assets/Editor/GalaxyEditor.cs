@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(SolarSystem))]
+[CustomEditor(typeof(Galaxy))]
 [CanEditMultipleObjects]
-public class SolarSystemEditor : Editor
+public class GalaxyEditor : Editor
 {
     public override void OnInspectorGUI()
     {
@@ -15,13 +15,13 @@ public class SolarSystemEditor : Editor
             var random = new System.Random();
             foreach (var target in targets)
             {
-                var solarSystem = target as SolarSystem;
+                var solarSystem = target as Galaxy;
                 solarSystem.seed = random.Next();
             }
             if(Application.isPlaying)
             foreach (var target in targets)
             {
-                var solarSystem = target as SolarSystem;
+                var solarSystem = target as Galaxy;
                 solarSystem.Recreate();
             }
         }

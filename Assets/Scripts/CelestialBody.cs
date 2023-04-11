@@ -32,6 +32,7 @@ public class CelestialBody : MonoBehaviour
         Initialize();
         GenerateMesh();
         GenerateColors();
+        SetLOD(0);
     }
 
     void Initialize()
@@ -67,7 +68,7 @@ public class CelestialBody : MonoBehaviour
             meshFilters[i] = meshObj.AddComponent<MeshFilter>();
             meshFilters[i].mesh = new Mesh();
 
-            terrainFaces[i] = new TerrainFace(meshFilters[i].mesh, resolution, directions[i], shapeGenerator);
+            terrainFaces[i] = new TerrainFace(meshFilters[i], resolution, directions[i], shapeGenerator);
         }
         colorGenerator.UpdateSettings(colorSettings, meshRenderers);
 
@@ -89,13 +90,15 @@ public class CelestialBody : MonoBehaviour
         else
             meshesGo.transform.LookAt(transform.parent.position);
         transform.RotateAround(transform.parent.position, data.orbitAxis, data.orbitSpeed * Time.deltaTime);
+
+        SetLOD(LODManager.instance.GetLODLevel(transform.position));
     }
 
     void GenerateMesh()
     {
         foreach(var face in terrainFaces)
         {
-            face.ConstructMesh();
+            face.ConstructMeshes();
         }
 
         colorGenerator.UpdateElevation(shapeGenerator.elevationMinMax);
@@ -107,6 +110,14 @@ public class CelestialBody : MonoBehaviour
         for (int i = 0; i < terrainFaces.Length; i++)
         {
                 terrainFaces[i].UpdateUVs(colorGenerator);
+        }
+    }
+
+    public void SetLOD(int lod)
+    {
+        foreach(var face in terrainFaces)
+        {
+            face.SetLOD(lod);
         }
     }
 }

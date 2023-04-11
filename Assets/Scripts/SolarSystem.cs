@@ -37,6 +37,8 @@ public class SolarSystem : MonoBehaviour
     public Gradient wetOceanColor;
     public Gradient frozenOceanColor;
 
+    public Material trailMaterial;
+
     const string glyphs = "0123456789";
 
     private void Awake()
@@ -63,6 +65,8 @@ public class SolarSystem : MonoBehaviour
         data.sunBody.radius = Random.Range(10f, 20f);
         data.sunBody.lightIntensity = lightIntensity * (100 / data.sunBody.radius);
         data.sunBody.rotationAxis = Vector3.up;
+        data.sunBody.orbitAxis = Vector3.up;
+        if (Random.value < 0.2f) data.sunBody.orbitAxis = Vector3.down;
 
         int planets = Random.Range(1, maxPlanets);
         float distance = data.sunBody.radius;
@@ -243,6 +247,34 @@ public class SolarSystem : MonoBehaviour
         go.transform.localPosition = new Vector3(0, 0, distance);
         go.transform.RotateAround(parent.position, body.orbitAxis, 360f * body.initialOrbitProgress);
 
+        /*var trailRenderer = go.AddComponent<TrailRenderer>();
+        trailRenderer.material = trailMaterial;
+        trailRenderer.generateLightingData = false;
+        trailRenderer.time = float.MaxValue;*/
+
+        if (body.radius > 1.5f)
+        {
+            var gravityAttractorGo = new GameObject();
+            gravityAttractorGo.transform.SetParent(go.transform, false);
+            /*if (body.type == CelestialBodyType.Star)
+            {
+                gravityAttractorGo.transform.localScale = body.lightRange * Vector3.one;
+            }
+            else
+            {
+                gravityAttractorGo.transform.localScale = body.radius * Vector3.one * 4f;
+            }*/
+            var collider = gravityAttractorGo.AddComponent<SphereCollider>();
+            collider.radius = body.radius * 4f;
+            if (body.type == CelestialBodyType.Star)
+            {
+                collider.radius = body.lightRange;
+            }
+            collider.isTrigger = true;
+
+            gravityAttractorGo.AddComponent<GravityAttractor>();
+        }
+
         foreach (var child in body.orbitingBodies)
         {
             CreateBody(child.orbitDistance, go.transform, child);
@@ -258,11 +290,11 @@ public class SolarSystem : MonoBehaviour
         Randomize();
     }
 
-    private void OnValidate()
+    /*private void OnValidate()
     {
         if (!Application.isPlaying) return;
         Recreate();
-    }
+    }*/
 }
 
 [System.Serializable]
