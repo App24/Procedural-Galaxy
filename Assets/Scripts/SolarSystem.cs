@@ -265,7 +265,7 @@ public class SolarSystem : MonoBehaviour
                 gravityAttractorGo.transform.localScale = body.radius * Vector3.one * 4f;
             }*/
             var collider = gravityAttractorGo.AddComponent<SphereCollider>();
-            collider.radius = body.radius * 4f;
+            collider.radius = body.radius * 8f;
             if (body.type == CelestialBodyType.Star)
             {
                 collider.radius = body.lightRange;

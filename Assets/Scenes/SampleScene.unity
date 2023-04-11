@@ -582,6 +582,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0240241373cdff548bf79d5deba5d9aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speed: 50
+  turningSpeed: 5
+  rebalanceSpeed: 1
 --- !u!54 &1110129700
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -592,7 +595,7 @@ Rigidbody:
   serializedVersion: 2
   m_Mass: 10
   m_Drag: 0.5
-  m_AngularDrag: 0.05
+  m_AngularDrag: 2
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
@@ -969,14 +972,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc0c2c89af409a84fb513f5751acd659, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seed: 50
+  seed: 85689420
   celestialBodyResolution: 20
   lightIntensity: 2500
   lightRadius: 3
   orbitSpeed: 20
   maxPlanets: 10
-  minStars: 10
-  maxStars: 20
+  minStars: 50
+  maxStars: 100
   planetMaterial: {fileID: 2100000, guid: bafc3429e9c076e48b04531a546f61b2, type: 2}
   shapeSettings: {fileID: 11400000, guid: 60cf60e82637aab4a8086878358409b5, type: 2}
   colorSettings: {fileID: 11400000, guid: 5ce294d59e88c6847aea9b93eb270cac, type: 2}
