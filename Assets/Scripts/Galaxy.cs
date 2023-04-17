@@ -20,6 +20,9 @@ public class Galaxy : MonoBehaviour
     public float orbitSpeed = 20f;
 
     [Delayed, Min(1)]
+    public int minPlanets = 1;
+
+    [Delayed, Min(1)]
     public int maxPlanets = 10;
 
     [Delayed, Min(1)]
@@ -63,6 +66,7 @@ public class Galaxy : MonoBehaviour
 
             var solarSystem = solarSystemGo.AddComponent<SolarSystem>();
             solarSystem.seed = seed + i;
+            solarSystem.minPlanets = minPlanets;
             solarSystem.maxPlanets = maxPlanets;
             solarSystem.lightIntensity = lightIntensity;
             solarSystem.lightRadius = lightRadius;
@@ -81,7 +85,9 @@ public class Galaxy : MonoBehaviour
 
             solarSystemGo.name = solarSystem.data.sunBody.name + " (Solar System)";
 
-            distance += (solarSystem.data.sunBody.orbitingBodies[solarSystem.data.sunBody.orbitingBodies.Length - 1].orbitDistance) * 5f;
+            if (solarSystem.data.sunBody.orbitingBodies.Length > 0)
+                distance += (solarSystem.data.sunBody.orbitingBodies[solarSystem.data.sunBody.orbitingBodies.Length - 1].orbitDistance) * 5f;
+            else distance += 20 * 5f;
 
             solarSystem.data.sunBody.orbitSpeed = orbitSpeed * (100f / distance);
 

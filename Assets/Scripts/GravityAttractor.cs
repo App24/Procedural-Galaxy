@@ -9,6 +9,7 @@ public class GravityAttractor : MonoBehaviour
         if(other.tag == "Player")
         {
             other.gameObject.transform.SetParent(transform.parent, true);
+            other.GetComponent<PlayerMovement>().UpdateOrbitingText();
         }
     }
 
@@ -17,6 +18,7 @@ public class GravityAttractor : MonoBehaviour
         if (other.tag == "Player")
         {
             other.gameObject.transform.SetParent(transform.parent.parent, true);
+            other.GetComponent<PlayerMovement>().UpdateOrbitingText();
         }
     }
 }

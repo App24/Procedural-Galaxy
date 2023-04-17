@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -10,16 +11,27 @@ public class PlayerMovement : MonoBehaviour
     float speed = 50;
 
     [SerializeField]
+    float fastForwardSpeed = 100;
+
+    [SerializeField]
     float turningSpeed = 50;
 
     [SerializeField]
     float rebalanceSpeed = 1;
+
+    [SerializeField]
+    TextMeshProUGUI speedText;
+
+    [SerializeField]
+    TextMeshProUGUI orbitingBodyText;
 
     Coroutine rebalanceCoroutine;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+
+        UpdateOrbitingText();
     }
 
     private void Update()
@@ -32,6 +44,8 @@ public class PlayerMovement : MonoBehaviour
             transform.localEulerAngles = angles;
             rb.angularVelocity = Vector3.zero;
         }
+
+        speedText.text = $"Speed: {rb.velocity.magnitude} km/s";
     }
 
     private void FixedUpdate()
@@ -45,15 +59,22 @@ public class PlayerMovement : MonoBehaviour
 
         if (rebalanceCoroutine == null)
         {
-            rb.AddRelativeTorque(new Vector3(-tiltVertical, tiltHorizontal, 0) * turningSpeed, ForceMode.Acceleration);
+            rb.AddRelativeTorque(new Vector3(-tiltVertical, tiltHorizontal, -horizontal) * turningSpeed, ForceMode.Acceleration);
 
-            rb.AddRelativeForce(new Vector3(horizontal, spaceVertical, vertical) * speed, ForceMode.Acceleration);
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                rb.AddRelativeForce(new Vector3(0, 0, vertical) * fastForwardSpeed, ForceMode.Acceleration);
+            }
+            else
+            {
+                rb.AddRelativeForce(new Vector3(0, 0, vertical) * speed, ForceMode.Acceleration);
+            }
         }
     }
 
     private IEnumerator RebalanceCoroutine()
     {
-        
+
         var angles = transform.eulerAngles;
         if (angles.x < 0) angles.x += 360;
         if (angles.z < 0) angles.x += 360;
@@ -66,5 +87,17 @@ public class PlayerMovement : MonoBehaviour
         angles.z = 0;
         transform.eulerAngles = angles;
         rebalanceCoroutine = null;
+    }
+
+    public void UpdateOrbitingText()
+    {
+        if (transform.parent == null)
+        {
+            orbitingBodyText.text = "Orbitting: Galaxy";
+        }
+        else
+        {
+            orbitingBodyText.text = $"Orbitting: {transform.parent.name}";
+        }
     }
 }

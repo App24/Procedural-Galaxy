@@ -13,6 +13,7 @@ public class CelestialBody : MonoBehaviour
 
     public int resolution;
 
+    public Mesh[] precalculatedMeshes;
     MeshFilter[] meshFilters;
     TerrainFace[] terrainFaces;
 
@@ -21,8 +22,14 @@ public class CelestialBody : MonoBehaviour
 
     GameObject meshesGo;
 
+    public static List<ShapeGenerator> shapeGenerators = new List<ShapeGenerator>();
+
+    int id;
+
     private void Start()
     {
+        id = shapeGenerators.Count;
+        shapeGenerators.Add(shapeGenerator);
         Recreate();
     }
 
@@ -67,8 +74,10 @@ public class CelestialBody : MonoBehaviour
             meshRenderers[i] = meshRenderer;
             meshFilters[i] = meshObj.AddComponent<MeshFilter>();
             meshFilters[i].mesh = new Mesh();
+            var meshCollider = meshObj.AddComponent<MeshCollider>();
+            meshCollider.convex = true;
 
-            terrainFaces[i] = new TerrainFace(meshFilters[i], resolution, directions[i], shapeGenerator);
+            terrainFaces[i] = new TerrainFace(meshFilters[i], meshCollider, resolution, directions[i], shapeGenerator, id);
         }
         colorGenerator.UpdateSettings(colorSettings, meshRenderers);
 
@@ -85,13 +94,17 @@ public class CelestialBody : MonoBehaviour
 
     private void Update()
     {
+        var lod = LODManager.instance.GetLODLevel(transform.position);
+
+        SetLOD(lod);
+
+        if (lod >= LODManager.instance.lodLevels.Length - 1) return;
+
         if (!data.tidalLocked)
             meshesGo.transform.Rotate(data.rotationAxis, data.rotationSpeed * Time.deltaTime, Space.Self);
         else
             meshesGo.transform.LookAt(transform.parent.position);
         transform.RotateAround(transform.parent.position, data.orbitAxis, data.orbitSpeed * Time.deltaTime);
-
-        SetLOD(LODManager.instance.GetLODLevel(transform.position));
     }
 
     void GenerateMesh()
@@ -109,7 +122,7 @@ public class CelestialBody : MonoBehaviour
         colorGenerator.UpdateColors();
         for (int i = 0; i < terrainFaces.Length; i++)
         {
-                terrainFaces[i].UpdateUVs(colorGenerator);
+            terrainFaces[i].UpdateUVs(colorGenerator);
         }
     }
 

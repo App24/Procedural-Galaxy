@@ -26,6 +26,9 @@ public class SolarSystem : MonoBehaviour
     public float orbitSpeed = 20f;
 
     [Delayed, Min(1)]
+    public int minPlanets = 1;
+
+    [Delayed, Min(1)]
     public int maxPlanets = 10;
 
     public Material planetMaterial;
@@ -46,7 +49,7 @@ public class SolarSystem : MonoBehaviour
         //Randomize();
     }
 
-    void Randomize()
+    public void Randomize()
     {
         Random.InitState(seed);
         data = new SolarSystemData();
@@ -66,9 +69,23 @@ public class SolarSystem : MonoBehaviour
         data.sunBody.lightIntensity = lightIntensity * (100 / data.sunBody.radius);
         data.sunBody.rotationAxis = Vector3.up;
         data.sunBody.orbitAxis = Vector3.up;
-        if (Random.value < 0.2f) data.sunBody.orbitAxis = Vector3.down;
+        {
+            float value = Random.value / Mathf.PI;
+            data.sunBody.orbitAxis = new Vector3(Mathf.Sin(value), Mathf.Cos(value));
+            data.sunBody.orbitAxis.Normalize();
+        }
+        /*if (Random.value < 0.2f)
+        {
+            if (Random.value < 0.4f)
+            {
+            }
+            else
+            {
+                data.sunBody.orbitAxis = Vector3.down;
+            }
+        }*/
 
-        int planets = Random.Range(1, maxPlanets);
+        int planets = Random.Range(minPlanets, maxPlanets);
         float distance = data.sunBody.radius;
         data.sunBody.orbitingBodies = new CelestialBodyData[planets];
 
@@ -86,7 +103,19 @@ public class SolarSystem : MonoBehaviour
             body.rotationAxis = Vector3.up;
             if (Random.value < 0.2f) body.rotationAxis = Vector3.left;
             body.orbitAxis = Vector3.up;
-            if (Random.value < 0.2f) body.orbitAxis = Vector3.down;
+            if (Random.value < 0.2f)
+            {
+                if(Random.value < 0.4f)
+                {
+                    float value = Random.value / Mathf.PI;
+                    body.orbitAxis = new Vector3(Mathf.Sin(value), Mathf.Cos(value));
+                    body.orbitAxis.Normalize();
+                }
+                else
+                {
+                    body.orbitAxis = Vector3.down;
+                }
+            }
             body.orbitSpeed = orbitSpeed * (100 / distance);
             body.tidalLocked = Random.value < 0.2f;
             body.initialOrbitProgress = Random.value;
@@ -111,24 +140,31 @@ public class SolarSystem : MonoBehaviour
             data.sunBody.orbitingBodies[i] = body;
         }
 
-        var firstDistance = data.sunBody.orbitingBodies[0].orbitDistance;
-
-        for (int i = 0; i < planets; i++)
+        if (planets > 0)
         {
-            var body = data.sunBody.orbitingBodies[i];
-            if (planets <= 1)
-                body.distanceFromStar = 0;
-            else body.distanceFromStar = (body.orbitDistance - firstDistance) / (distance - firstDistance);
-            body.waterAlbedo = body.distanceFromStar * 0.8f;
-            body.albedo = Mathf.Clamp01(body.distanceFromStar - 0.5f)  * 2 * 0.5f;
+            var firstDistance = data.sunBody.orbitingBodies[0].orbitDistance;
+
+            for (int i = 0; i < planets; i++)
+            {
+                var body = data.sunBody.orbitingBodies[i];
+                if (planets <= 1)
+                    body.distanceFromStar = 0;
+                else body.distanceFromStar = (body.orbitDistance - firstDistance) / (distance - firstDistance);
+                body.waterAlbedo = body.distanceFromStar * 0.8f;
+                body.albedo = Mathf.Clamp01(body.distanceFromStar - 0.5f) * 2 * 0.5f;
+            }
         }
 
-        data.sunBody.lightRange = data.sunBody.orbitingBodies[planets - 1].orbitDistance * lightRadius;
+        data.sunBody.lightRange = 20 * lightRadius;
+        if (planets > 0)
+        {
+            data.sunBody.lightRange = data.sunBody.orbitingBodies[planets - 1].orbitDistance * lightRadius;
+        }
 
         CreateSystem();
     }
 
-    void CreateSystem()
+    public void CreateSystem()
     {
         CreateBody(0, transform, data.sunBody);
     }

@@ -489,7 +489,7 @@ InputManager:
     m_Name: Space Vertical
     descriptiveName: 
     descriptiveNegativeName: 
-    negativeButton: left shift
+    negativeButton: left ctrl
     positiveButton: space
     altNegativeButton: 
     altPositiveButton: 

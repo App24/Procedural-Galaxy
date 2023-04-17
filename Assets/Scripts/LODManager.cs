@@ -6,6 +6,9 @@ public class LODManager : MonoBehaviour
 {
     public int[] lodLevels;
 
+    [SerializeField]
+    int forceLOD = -1;
+
     public static LODManager instance;
 
     private void Awake()
@@ -20,6 +23,7 @@ public class LODManager : MonoBehaviour
 
     public int GetLODLevel(float distance)
     {
+        if (forceLOD != -1) return forceLOD;
         for (int i = 0; i < lodLevels.Length; i++)
         {
             var lod = lodLevels[i];
