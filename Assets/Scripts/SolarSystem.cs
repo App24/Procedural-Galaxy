@@ -31,6 +31,7 @@ public class SolarSystem : MonoBehaviour
     [Delayed, Min(1)]
     public int maxPlanets = 10;
 
+    public Material sunMaterial;
     public Material planetMaterial;
 
     public ShapeSettings shapeSettings;
@@ -174,7 +175,14 @@ public class SolarSystem : MonoBehaviour
         GameObject go = new GameObject();
         go.name = body.name;
         var celestialBody = go.AddComponent<CelestialBody>();
-        celestialBody.material = planetMaterial;
+        if (body.type == CelestialBodyType.Star)
+        {
+            celestialBody.material = sunMaterial;
+        }
+        else
+        {
+            celestialBody.material = planetMaterial;
+        }
         celestialBody.data = body;
         celestialBody.resolution = body.type == CelestialBodyType.Planet ? celestialBodyResolution : 20;
         var shapeSettings = ShapeSettings.CreateInstance<ShapeSettings>();

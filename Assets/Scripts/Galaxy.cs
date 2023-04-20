@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class Galaxy : MonoBehaviour
 {
-    [Delayed]
-    public int seed;
+    public static int seed;
 
     [Range(2, 256), Delayed]
     public int celestialBodyResolution = 10;
@@ -31,6 +30,7 @@ public class Galaxy : MonoBehaviour
     [Delayed, Min(1)]
     public int maxStars = 10;
 
+    public Material sunMaterial;
     public Material planetMaterial;
 
     public ShapeSettings shapeSettings;
@@ -57,6 +57,7 @@ public class Galaxy : MonoBehaviour
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             go.transform.SetParent(transform, false);
+            go.GetComponent<MeshRenderer>().material = sunMaterial;
             go.transform.localScale = new Vector3(100, 100, 100);
         }
         for (int i = 0; i < stars; i++)
@@ -79,6 +80,7 @@ public class Galaxy : MonoBehaviour
             solarSystem.wetOceanColor = wetOceanColor;
             solarSystem.frozenOceanColor = frozenOceanColor;
             solarSystem.trailMaterial = trailMaterial;
+            solarSystem.sunMaterial = sunMaterial;
 
             solarSystem.Recreate();
 

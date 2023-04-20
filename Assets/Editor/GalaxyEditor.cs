@@ -4,7 +4,6 @@ using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(Galaxy))]
-[CanEditMultipleObjects]
 public class GalaxyEditor : Editor
 {
     public override void OnInspectorGUI()
@@ -16,7 +15,7 @@ public class GalaxyEditor : Editor
             foreach (var target in targets)
             {
                 var solarSystem = target as Galaxy;
-                solarSystem.seed = random.Next();
+                Galaxy.seed = random.Next();
             }
             if(Application.isPlaying)
             foreach (var target in targets)
