@@ -135,7 +135,7 @@ public class TerrainFace
 
         currentLOD = lod;
         meshFilter.mesh = lodMeshes[lod];
-        meshCollider.sharedMesh = lodMeshes[lod];
+        meshCollider.sharedMesh = lodMeshes[lodMeshes.Length - 1];
     }
 
     public void UpdateUVs(ColorGenerator colorGenerator)
